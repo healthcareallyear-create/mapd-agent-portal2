@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026 MAPD Agent Portal</title>
+  <style>
+    :root {
+      --slate-50:#f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1;
+      --slate-400:#94a3b8; --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155; --slate-800:#1e293b; --slate-900:#0f172a;
+      --indigo-900:#312e81; --indigo-950:#1e1b4b; --blue-500:#3b82f6; --amber-400:#fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--slate-800); background:var(--slate-50); }
+    a { color: inherit; text-decoration: none; }
+    .header { background:#1e1b4b; color:white; padding:40px 24px; text-align:center; position:relative; overflow:hidden; border-bottom:4px solid var(--blue-500); }
+    .header:before { content:""; position:absolute; inset:0; opacity:.10; background-image:linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size:40px 40px; }
+    .header-inner { position:relative; z-index:1; }
+    .badge { display:inline-block; background:rgba(49,46,129,.8); color:#c7d2fe; font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; padding:7px 16px; border-radius:999px; border:1px solid rgba(67,56,202,.5); margin-bottom:16px; }
+    h1 { font-size:40px; line-height:1.05; margin:0 0 12px; letter-spacing:-.03em; }
+    .subtitle { color:#c7d2fe; font-size:14px; max-width:660px; margin:0 auto; font-weight:500; }
+    .shell { max-width:1600px; margin:0 auto; padding:24px; display:flex; gap:32px; align-items:flex-start; }
+    .sidebar { width:288px; flex:0 0 288px; display:flex; flex-direction:column; gap:24px; }
+    .panel { background:white; border:1px solid var(--slate-200); border-radius:14px; box-shadow:0 1px 2px rgba(15,23,42,.05); padding:20px; }
+    .panel-title { display:flex; gap:8px; align-items:center; font-weight:700; color:var(--slate-700); padding-bottom:10px; margin-bottom:16px; border-bottom:1px solid var(--slate-100); }
+    .label { display:block; font-size:12px; color:var(--slate-500); font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; }
+    .search-wrap { position:relative; }
+    .search-wrap span { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--slate-400); }
+    input[type="text"] { width:100%; padding:10px 12px 10px 38px; background:var(--slate-50); border:1px solid var(--slate-200); border-radius:10px; font-size:14px; outline:none; }
+    input[type="text"]:focus, textarea:focus { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.15); }
+    .general-links { display:flex; flex-direction:column; gap:8px; }
+    .general-links a { display:block; padding:10px 12px; border-radius:10px; background:var(--slate-50); color:var(--slate-700); font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .general-links a:hover { background:#eef2ff; color:#3730a3; }
+    .switch-row { display:flex; align-items:center; justify-content:space-between; padding-top:10px; }
+    .switch { width:44px; height:24px; border-radius:999px; border:0; background:var(--slate-300); position:relative; cursor:pointer; transition:.2s; }
+    .switch span { position:absolute; top:4px; left:4px; width:16px; height:16px; border-radius:50%; background:white; transition:.2s; }
+    .switch.on { background:#4f46e5; }
+    .switch.on span { transform:translateX(20px); }
+    textarea { width:100%; min-height:310px; resize:vertical; background:var(--slate-50); border:1px solid var(--slate-200); border-radius:10px; color:var(--slate-700); padding:12px; font-size:13px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note-help { font-size:12px; color:var(--slate-500); margin:-6px 0 10px; }
+    .add-btn { width:100%; padding:13px; border-radius:14px; background:var(--slate-900); color:white; font-weight:800; border:0; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 10px rgba(15,23,42,.12); }
+    .add-btn:hover { background:#1f2937; }
+    .main { flex:1; width:100%; }
+    .main-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px; }
+    .main-head h2 { font-size:20px; margin:0; display:flex; gap:8px; align-items:center; }
+    .count { color:var(--slate-400); font-weight:600; font-size:18px; }
+    .pill { display:inline-block; padding:6px 12px; border-radius:999px; border:1px solid var(--slate-200); background:white; box-shadow:0 1px 2px rgba(15,23,42,.05); font-size:14px; color:var(--slate-500); font-weight:600; }
+    .grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:24px; }
+    .card { background:white; border:1px solid var(--slate-200); border-top:4px solid var(--carrier,#6366f1); border-radius:18px; overflow:hidden; box-shadow:0 1px 2px rgba(15,23,42,.06); display:flex; flex-direction:column; position:relative; transition:.2s; }
+    .card:hover { box-shadow:0 12px 30px rgba(15,23,42,.10); transform:translateY(-1px); }
+    .star { position:absolute; top:14px; right:14px; border:0; background:transparent; color:var(--slate-300); font-size:22px; cursor:pointer; }
+    .star.active { color:var(--amber-400); }
+    .card-body { padding:28px 24px 20px; display:flex; flex-direction:column; align-items:center; text-align:center; flex:1; }
+    .icon { width:56px; height:56px; border-radius:999px; background:var(--carrier-soft,#eef2ff); color:var(--carrier,#4f46e5); display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:16px; box-shadow:0 1px 3px rgba(15,23,42,.08); }
+    .card h3 { margin:0 0 8px; font-size:20px; }
+    .id-badge { display:inline-block; padding:4px 10px; border-radius:999px; background:var(--carrier-soft,#eef2ff); color:var(--carrier,#4f46e5); font-size:12px; font-weight:800; margin-bottom:16px; }
+    .phone { margin-top:auto; font-size:14px; color:var(--slate-500); display:flex; align-items:center; gap:6px; }
+    .actions { padding:0 16px 16px; display:flex; flex-direction:column; gap:9px; }
+    .open-btn { padding:11px; border-radius:10px; color:white; background:var(--carrier,#4f46e5); display:flex; align-items:center; justify-content:center; gap:8px; font-weight:800; box-shadow:0 1px 2px rgba(15,23,42,.1); }
+    .resource-btn { padding:10px; border-radius:10px; border:1px solid var(--slate-200); color:var(--slate-600); background:var(--slate-50); display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700; cursor:pointer; }
+    .resource-btn:hover { background:var(--slate-100); }
+    .empty { text-align:center; padding:80px 20px; background:white; border:1px dashed var(--slate-300); border-radius:14px; color:var(--slate-500); }
+    .footer { padding:24px; text-align:center; color:var(--slate-400); font-size:12px; font-weight:700; border-top:1px solid var(--slate-200); background:white; margin-top:16px; }
+    .modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.65); backdrop-filter:blur(4px); z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; }
+    .modal { background:white; border-radius:18px; box-shadow:0 25px 60px rgba(15,23,42,.25); width:min(768px, 100%); max-height:85vh; overflow:hidden; display:flex; flex-direction:column; }
+    .modal-head { background:var(--carrier,#4f46e5); color:white; padding:24px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+    .modal-title { margin:0 0 6px; font-size:24px; display:flex; align-items:center; gap:10px; }
+    .modal-sub { color:rgba(255,255,255,.82); display:flex; gap:18px; flex-wrap:wrap; font-size:14px; }
+    .close { border:0; background:rgba(255,255,255,.12); color:white; border-radius:999px; width:38px; height:38px; font-size:24px; cursor:pointer; }
+    .modal-body { padding:24px; background:var(--slate-50); overflow:auto; }
+    .section-title { font-size:18px; font-weight:800; color:var(--slate-800); border-bottom:1px solid var(--slate-200); padding-bottom:9px; margin:0 0 16px; display:flex; align-items:center; gap:8px; }
+    .link-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:30px; }
+    .link-card, .plan-card { background:white; border:1px solid var(--slate-200); border-radius:10px; box-shadow:0 1px 2px rgba(15,23,42,.05); display:flex; align-items:center; gap:12px; padding:13px; min-width:0; }
+    .link-card:hover, .plan-card:hover { border-color:var(--slate-300); box-shadow:0 4px 12px rgba(15,23,42,.08); color:#2563eb; }
+    .link-title { font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
+    .plan-list { display:flex; flex-direction:column; gap:12px; }
+    .doc-icon { width:38px; height:38px; border-radius:10px; background:var(--carrier-soft,#eef2ff); color:var(--carrier,#4f46e5); display:flex; align-items:center; justify-content:center; flex:0 0 38px; }
+    .plan-text { flex:1; min-width:0; }
+    .plan-name { font-size:14px; font-weight:800; color:var(--slate-800); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .plan-meta { font-size:12px; color:var(--slate-500); margin-top:3px; }
+    .disabled { opacity:.65; cursor:not-allowed; }
+    .modal-foot { padding:16px; display:flex; justify-content:flex-end; border-top:1px solid var(--slate-100); background:white; }
+    .modal-foot button { padding:10px 22px; border-radius:10px; background:var(--slate-100); color:var(--slate-700); border:0; font-weight:800; cursor:pointer; }
+    @media (max-width: 1100px) { .shell { flex-direction:column; } .sidebar { width:100%; flex-basis:auto; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } textarea { min-height:180px; } }
+    @media (max-width: 700px) { h1 { font-size:32px; } .shell { padding:16px; } .grid { grid-template-columns:1fr; } .main-head { align-items:flex-start; flex-direction:column; } .link-grid { grid-template-columns:1fr; } .modal-head { padding:18px; } .modal-title { font-size:20px; } }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="badge">Carrier Workspace</div>
+      <h1>Agent MAPD Portal</h1>
+      <p class="subtitle">Access 2026 Medicare Advantage carrier portals, support numbers, plan documents, and sales resources in one workspace.</p>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <section class="panel">
+        <div class="panel-title">⚙️ <span>Workspace Tools</span></div>
+        <div style="margin-bottom:20px;">
+          <label class="label">Search Carrier</label>
+          <div class="search-wrap"><span>🔎</span><input id="search" type="text" placeholder="Search..." /></div>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label class="label">General Links</label>
+          <div id="generalLinks" class="general-links"></div>
+        </div>
+        <div class="switch-row">
+          <span style="font-size:14px;font-weight:700;color:var(--slate-700);">Starred Portals Only</span>
+          <button id="starSwitch" class="switch"><span></span></button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">📘 <span>Agency Notebook</span></div>
+        <p class="note-help">Private helper notepad for carrier codes, reminders, and follow-up notes. Saved on this device.</p>
+        <textarea id="notes"></textarea>
+      </section>
+
+      <button class="add-btn" id="addBtn">＋ Add Custom Portal</button>
+    </aside>
+
+    <main class="main">
+      <div class="main-head">
+        <h2>Active Carrier Portals <span id="count" class="count"></span></h2>
+        <span id="showing" class="pill">Showing: All</span>
+      </div>
+      <div id="carrierGrid" class="grid"></div>
+      <div id="emptyState" class="empty" style="display:none;">🔎<h3>No carriers found</h3><p>Try adjusting your search or filters.</p></div>
+    </main>
+  </div>
+
+  <footer class="footer">© 2026 Agent MAPD Portal. Designed for quick access to carrier resources and plan links.</footer>
+
+  <div id="modalRoot"></div>
+
+  <script>
+    const Search = 'Search', Star = 'Star', Settings = 'Settings', Phone = 'Phone', Book = 'Book', FileText = 'FileText', ExternalLink = 'ExternalLink', X = 'X', ChevronRight = 'ChevronRight', Shield = 'Shield', Activity = 'Activity', Heart = 'Heart', Plus = 'Plus', Globe = 'Globe';
+const GENERAL_LINKS = [
+  { name: 'HealthSherpa Enrollment', url: 'https://medicare.healthsherpa.com/' },
+  { name: 'Extra Help Part D', url: 'https://www.ssa.gov/medicare/part-d-extra-help' },
+  { name: 'Medicare Savings Program', url: 'https://www.medicare.gov/basics/costs/help/medicare-savings-programs' },
+];
+
+const CARRIERS = [
+  {
+    id: 'aetna',
+    name: 'Aetna',
+    agentId: 'Agent Services',
+    phone: '1-866-714-9301',
+    portalUrl: 'https://www.aetna.com/medicare.html?redirect=akamai&',
+    color: 'bg-fuchsia-600',
+    bgColor: 'bg-fuchsia-50',
+    textColor: 'text-fuchsia-600',
+    borderColor: 'border-fuchsia-200',
+    icon: Activity,
+    links: [
+      { title: 'Video Sales Presentation', url: 'https://drive.google.com/file/d/1QWngt4Ee5S_MzZga8v-tfPN0q3a929-c/view?usp=sharing' },
+      { title: 'Find Doctors, Hospitals, Dental, Vision', url: 'https://www.aetna.com/medicare/find-provider.html' },
+      { title: 'OTC Benefit', url: 'https://www.aetna.com/medicare/compare-plans-enroll/benefits-medicare-advantage-plan/otc-benefits.html' },
+    ],
+    plans: [
+      { name: 'Signature (HMO) H3146-001 | $0 Premium', url: 'https://drive.google.com/file/d/146RyeMr7Dx_XMbBHaZctmMGl6bRIzKAP/view?usp=sharing' },
+      { name: 'Signature (PPO) H5521-081 | $0 Premium', url: 'https://drive.google.com/file/d/1yQ5o5SzkW__KJCPp0TV9p83FfHZKW0fS/view?usp=sharing' },
+    ]
+  },
+  {
+    id: 'bcbsnc',
+    name: 'BCBSNC',
+    agentId: 'P0039331',
+    phone: '1-888-868-5598',
+    portalUrl: 'https://shopper.bcbsnc.com/medicare-plan-finder/index.html#/getStarted',
+    color: 'bg-blue-600',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-600',
+    borderColor: 'border-blue-200',
+    icon: Shield,
+    links: [
+      { title: '2026 Summary of Benefits', url: 'https://drive.google.com/file/d/1pwmpPfx7y_tHkE1Fqcdodt9ZDRghw60w/view?usp=sharing' },
+      { title: 'Prescription Drug Pricing Tool', url: 'https://bcbsnc.destinationrx.com/Compare/MDC/2026/home/home' },
+      { title: '2026 OTC Catalog', url: 'https://drive.google.com/file/d/1NItMtZAJ76dgfIAn-XL_ddwg1OWU8m1f/view?usp=sharing' },
+      { title: '2026 MAPD PowerPoint Presentation', url: 'https://agent.bcbsnc.com/assets/producer/secure/pdfs/u14449-medicare-advantage-agent-sales-presentation-2026.pdf' },
+      { title: 'Carelink', url: 'https://www.carelinx.com/bluecrossnc' },
+      { title: 'Carallel', url: 'https://carallel.com/' },
+      { title: 'Liberty Dental', url: 'https://client.libertydentalplan.com/BCBSNC' },
+    ],
+    plans: []
+  },
+  {
+    id: 'cigna',
+    name: 'Cigna (Healthsprings)',
+    agentId: 'Agent Services',
+    phone: '1-866-442-7516',
+    portalUrl: 'https://www.healthspring.com/medicare',
+    color: 'bg-teal-600',
+    bgColor: 'bg-teal-50',
+    textColor: 'text-teal-600',
+    borderColor: 'border-teal-200',
+    icon: Heart,
+    links: [
+      { title: 'Shop and Compare', url: 'https://www.healthspring.com/medicare' },
+      { title: 'Paper Directory', url: 'https://drive.google.com/file/d/1UAR8lxfnBBV8uV_kUbIZBEK0D2C_2wgu/view?usp=sharing' },
+      { title: '2026 OTC Benefit Catalog', url: 'https://drive.google.com/file/d/1KT4ZZaSld4Etcr-NfCLm5vVUNsC009GD/view?usp=sharing' },
+    ],
+    plans: [
+      { name: 'Preferred Plus (HMO) H9725-017-001', url: 'https://drive.google.com/file/d/1khlgLjSdY05wyG38KSGjde476QGuauMY/view?usp=sharing' },
+      { name: 'Preferred (HMO) H9725-009-001', url: 'https://drive.google.com/file/d/1t-D8UXVOi5_0zon1uMff0VuKGNxrAU4i/view?usp=sharing' },
+      { name: 'Preferred Select (HMO) H9725-014 (Limited Dental)', url: 'https://drive.google.com/file/d/1VMdVEJtAiq_J4JI0LYyvM2OqAz48XIPx/view?usp=sharing' },
+      { name: 'Preferred Savings (HMO) H9725-015-001 (Give Back)', url: 'https://drive.google.com/file/d/1D-Bbpg8pS4Q1ee1iEF8w_pnYk_LAVuH5/view?usp=sharing' },
+    ]
+  },
+  {
+    id: 'devoted',
+    name: 'Devoted',
+    agentId: 'Agent Support',
+    phone: '1-877-764-9446',
+    portalUrl: 'https://agent.devoted.com/',
+    color: 'bg-orange-600',
+    bgColor: 'bg-orange-50',
+    textColor: 'text-orange-600',
+    borderColor: 'border-orange-200',
+    icon: Globe,
+    links: [
+      { title: 'Search Providers', url: 'https://www.devoted.com/search-providers' },
+      { title: 'English Sales Video 2026', url: 'https://www.youtube.com/watch?v=M3DnG0ZMbpI' },
+      { title: 'Mail Order Pharmacy', url: 'https://www.devoted.com/prescription-drugs/mail-order-pharmacy/' },
+      { title: 'OTC Benefit', url: 'https://devoted.com/otc/' },
+      { title: '2026 OTC Catalog', url: 'https://assets.devoted.com/plan-documents/2026/DH-OTC-Catalog2026_ENG.pdf' },
+      { title: 'Food and Home Card', url: 'https://www.devoted.com/food-and-home/' },
+      { title: 'Plan Eligibility', url: 'https://docs.google.com/spreadsheets/d/1LOgd6hbZTS9XnG-szMU3CS-r5VWluyUc/edit?gid=1901965526#gid=1901965526' },
+      { title: 'HRA Questions', url: 'https://drive.google.com/file/d/1jgWbQHuMldZO62ChOYVJM9DJxd6lLiu6/view?usp=sharing' },
+    ],
+    plans: [
+      { name: 'CHOICE 001 NC (PPO) H9700-001-000', url: 'https://drive.google.com/file/d/14HepymwwDeEEmGt3eOM6hykD1ggRnmkh/view?usp=sharing' },
+      { name: '2026 CHOICE 001 NC (PPO) Care Guide', url: 'https://assets.devoted.com/plan-documents/2026/2026-DEVOTED-CHOICE-001-NC-(PPO)-WELCOME_KIT-H9700-001-ENG.pdf' },
+      { name: 'CHOICE GIVEBACK 002 NC (PPO)', url: 'https://drive.google.com/file/d/1ZTKMbWCltUCUuZigZ8HZkVi6J4XFl0Sm/view?usp=sharing' },
+      { name: 'C-SNP PREMIUM 016 NC (HMO C-SNP) LIS', url: 'https://drive.google.com/file/d/15eueLrcTPEN2RDfWNpyyPYywWBK-gDh3/view?usp=sharing' },
+      { name: 'DUAL FULL 013 NC (HMO D-SNP)', url: 'https://drive.google.com/file/d/1iFbVXX5pVd7whZZ2ix9Ermb8ISoV0Hy_/view?usp=sharing' },
+      { name: 'C-SNP PLUS 015 NC (HMO C-SNP) $468/mo', url: 'https://drive.google.com/file/d/1b3ZtnpQP91mi2Jvwe-4g3sB4YpmGbqot/view?usp=sharing' },
+    ]
+  },
+  {
+    id: 'humana',
+    name: 'Humana',
+    agentId: '1528867',
+    phone: '1-800-309-3163',
+    portalUrl: 'https://shop.humana.com/medicare-plans/',
+    color: 'bg-green-600',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-600',
+    borderColor: 'border-green-200',
+    icon: Activity,
+    links: [
+      { title: 'Find a Doctor', url: 'https://findcare.humana.com/' },
+    ],
+    plans: [
+      { name: 'Gold Plus H1036-335 (HMO-POS)', url: 'https://drive.google.com/file/d/1nrhebO6gA3IC6kZmBQUiKuz4kNJzU0oY/view?usp=sharing' }
+    ]
+  },
+  {
+    id: 'uhc',
+    name: 'UnitedHealthcare',
+    agentId: 'Producer Help Desk',
+    phone: '1-888-381-8581',
+    portalUrl: 'https://identity.onehealthcareid.com/oneapp/index.html#/login',
+    color: 'bg-indigo-700',
+    bgColor: 'bg-indigo-50',
+    textColor: 'text-indigo-700',
+    borderColor: 'border-indigo-200',
+    icon: Shield,
+    links: [
+      { title: 'View Plans', url: 'https://www.uhc.com/medicare?WT.mc_id=8031053' },
+      { title: 'Find Doctors', url: 'https://www.uhc.com/find-a-doctor' },
+    ],
+    plans: [
+      { name: 'AARP Medicare Advantage NC-0015 (HMO-POS)', url: 'https://drive.google.com/file/d/1nrhebO6gA3IC6kZmBQUiKuz4kNJzU0oY/view?usp=sharing' },
+      { name: 'AARP Medicare Advantage NC-0021 (HMO-POS)', url: 'https://drive.google.com/file/d/17hh29szVPCsuUiY6kYgiD9OqDi8NK3u_/view?usp=sharing' },
+      { name: 'Dual Complete NC-D001 (HMO-POS D-SNP)', url: 'https://drive.google.com/file/d/1oKp15v4vnyXSvpGoQ2mIQOS93F1A8FVq/view?usp=sharing' }
+    ]
+  },
+  {
+    id: 'wellcare',
+    name: 'Wellcare',
+    agentId: 'Broker Portal',
+    phone: 'See Portal',
+    portalUrl: 'https://www.wellcare.com/en/fap',
+    color: 'bg-cyan-600',
+    bgColor: 'bg-cyan-50',
+    textColor: 'text-cyan-600',
+    borderColor: 'border-cyan-200',
+    icon: Activity,
+    links: [
+      { title: 'Provider Search', url: 'https://www.wellcare.com/en/fap' },
+    ],
+    plans: [
+      { name: 'Assist Open (PPO) H1914-009-000 (LIS)', url: '#' }, // URL wasn't provided in the prompt explicitly
+      { name: 'Simple Open (PPO) H1914-007-000 ($4000 Dental)', url: 'https://drive.google.com/file/d/1Da3So0VsyPlCBKCdjesyC2imezbmpGsT/view?usp=sharing' },
+    ]
+  }
+];
+
+// Default notepad content summarizing help desks
+const DEFAULT_NOTES = `SUPPORT HOTLINES (2026):
+• Aetna: 1-866-714-9301
+• BCBSNC: 1-888-868-5598 (ID: P0039331)
+• Cigna: 1-866-442-7516
+• Devoted: 1-877-764-9446
+• Humana: 1-800-309-3163 (ID: 1528867)
+• UHC: 1-888-381-8581
+
+General Reminders:
+Ensure Scope of Appointment is completed 48 hrs prior.`;
+
+    const colorMap = {
+      'bg-fuchsia-600': ['#c026d3', '#fdf4ff'],
+      'bg-blue-600': ['#2563eb', '#eff6ff'],
+      'bg-teal-600': ['#0d9488', '#f0fdfa'],
+      'bg-orange-600': ['#ea580c', '#fff7ed'],
+      'bg-green-600': ['#16a34a', '#f0fdf4'],
+      'bg-indigo-700': ['#4338ca', '#eef2ff'],
+      'bg-cyan-600': ['#0891b2', '#ecfeff']
+    };
+    const iconMap = { Activity:'📈', Shield:'🛡️', Heart:'💙', Globe:'🌐' };
+
+    let searchTerm = '';
+    let showStarred = false;
+    let starredIds = loadJson('mapdStarredIds', ['uhc', 'aetna']);
+    let notes = localStorage.getItem('mapdNotes') || DEFAULT_NOTES;
+
+    const searchInput = document.getElementById('search');
+    const starSwitch = document.getElementById('starSwitch');
+    const notesInput = document.getElementById('notes');
+    const grid = document.getElementById('carrierGrid');
+    const count = document.getElementById('count');
+    const showing = document.getElementById('showing');
+    const emptyState = document.getElementById('emptyState');
+    const modalRoot = document.getElementById('modalRoot');
+
+    function loadJson(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    }
+
+    function carrierStyle(carrier) {
+      const [main, soft] = colorMap[carrier.color] || ['#4f46e5', '#eef2ff'];
+      return `--carrier:${main};--carrier-soft:${soft};`;
+    }
+
+    function renderGeneralLinks() {
+      document.getElementById('generalLinks').innerHTML = GENERAL_LINKS.map(link => `
+        <a href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer">${escapeHtml(link.name)}</a>
+      `).join('');
+    }
+
+    function carrierMatches(carrier) {
+      const values = [carrier.name, carrier.agentId, carrier.phone, ...carrier.links.map(l => l.title), ...carrier.plans.map(p => p.name)].join(' ').toLowerCase();
+      return values.includes(searchTerm.toLowerCase()) && (!showStarred || starredIds.includes(carrier.id));
+    }
+
+    function render() {
+      starSwitch.classList.toggle('on', showStarred);
+      showing.textContent = `Showing: ${showStarred ? 'Starred' : 'All'}`;
+      const carriers = CARRIERS.filter(carrierMatches);
+      count.textContent = `(${carriers.length})`;
+      emptyState.style.display = carriers.length ? 'none' : 'block';
+      grid.style.display = carriers.length ? 'grid' : 'none';
+      grid.innerHTML = carriers.map(carrier => `
+        <article class="card" style="${carrierStyle(carrier)}">
+          <button class="star ${starredIds.includes(carrier.id) ? 'active' : ''}" data-star="${escapeHtml(carrier.id)}">★</button>
+          <div class="card-body">
+            <div class="icon">${iconMap[carrier.icon] || '🔗'}</div>
+            <h3>${escapeHtml(carrier.name)}</h3>
+            <span class="id-badge">ID: ${escapeHtml(carrier.agentId)}</span>
+            <p class="phone">☎️ ${escapeHtml(carrier.phone)}</p>
+          </div>
+          <div class="actions">
+            <a class="open-btn" href="${escapeHtml(carrier.portalUrl)}" target="_blank" rel="noreferrer">Open Portal ↗</a>
+            <button class="resource-btn" data-resource="${escapeHtml(carrier.id)}">📘 View 2026 Resources & Plans</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function openModal(carrier) {
+      modalRoot.innerHTML = `
+        <div class="modal-backdrop" data-close="true">
+          <div class="modal" style="${carrierStyle(carrier)}" role="dialog" aria-modal="true">
+            <div class="modal-head">
+              <div>
+                <h2 class="modal-title">${iconMap[carrier.icon] || '🔗'} ${escapeHtml(carrier.name)} 2026 Resources</h2>
+                <div class="modal-sub"><span>Agent ID: ${escapeHtml(carrier.agentId)}</span><span>☎️ ${escapeHtml(carrier.phone)}</span></div>
+              </div>
+              <button class="close" data-close="true">×</button>
+            </div>
+            <div class="modal-body">
+              ${carrier.links.length ? `
+                <section>
+                  <h3 class="section-title">🌐 Tools & Portals</h3>
+                  <div class="link-grid">
+                    ${carrier.links.map(link => `
+                      <a class="link-card" href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer">
+                        <span class="link-title">${escapeHtml(link.title)}</span><span>↗</span>
+                      </a>`).join('')}
+                  </div>
+                </section>` : ''}
+              ${carrier.plans.length ? `
+                <section>
+                  <h3 class="section-title">📄 2026 Plan Documents & Benefits</h3>
+                  <div class="plan-list">
+                    ${carrier.plans.map(plan => {
+                      const hasLink = plan.url && plan.url !== '#';
+                      const inner = `<span class="doc-icon">📄</span><span class="plan-text"><span class="plan-name">${escapeHtml(plan.name)}</span><span class="plan-meta">${hasLink ? 'Open resource' : 'Link needed'}</span></span><span>›</span>`;
+                      return hasLink ? `<a class="plan-card" href="${escapeHtml(plan.url)}" target="_blank" rel="noreferrer">${inner}</a>` : `<div class="plan-card disabled">${inner}</div>`;
+                    }).join('')}
+                  </div>
+                </section>` : ''}
+            </div>
+            <div class="modal-foot"><button data-close="true">Close</button></div>
+          </div>
+        </div>`;
+    }
+
+    document.addEventListener('click', event => {
+      const starBtn = event.target.closest('[data-star]');
+      if (starBtn) {
+        const id = starBtn.getAttribute('data-star');
+        starredIds = starredIds.includes(id) ? starredIds.filter(item => item !== id) : [...starredIds, id];
+        localStorage.setItem('mapdStarredIds', JSON.stringify(starredIds));
+        render();
+        return;
+      }
+      const resourceBtn = event.target.closest('[data-resource]');
+      if (resourceBtn) {
+        const carrier = CARRIERS.find(item => item.id === resourceBtn.getAttribute('data-resource'));
+        if (carrier) openModal(carrier);
+        return;
+      }
+      if (event.target.closest('[data-close]')) modalRoot.innerHTML = '';
+    });
+
+    searchInput.addEventListener('input', e => { searchTerm = e.target.value; render(); });
+    starSwitch.addEventListener('click', () => { showStarred = !showStarred; render(); });
+    notesInput.value = notes;
+    notesInput.addEventListener('input', e => { localStorage.setItem('mapdNotes', e.target.value); });
+    document.getElementById('addBtn').addEventListener('click', () => alert('To add a new carrier, edit the CARRIERS list in the React project or ask ChatGPT to add the carrier details for you.'));
+
+    renderGeneralLinks();
+    render();
+  </script>
+</body>
+</html>
